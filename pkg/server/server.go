@@ -14,6 +14,7 @@ import (
 	"github.com/rancher/apiserver/pkg/types"
 	"github.com/rancher/apiserver/pkg/writer"
 	"github.com/rancher/wrangler/pkg/schemas/validation"
+	"github.com/sirupsen/logrus"
 )
 
 type RequestHandler interface {
@@ -106,15 +107,16 @@ func (s *Server) handle(apiOp *types.APIRequest, parser parse.Parser) {
 		apiOp.Schemas = s.Schemas
 	}
 
+	logrus.Infof("[Server.handle] 1: flag: %s, time: %s", apiOp.Request.Header.Get("flag"), time.Now().String())
 	if err := parser(apiOp, parse.MuxURLParser); err != nil {
 		// ensure defaults set so writer is assigned
 		s.setDefaults(apiOp)
 		apiOp.WriteError(err)
 		return
 	}
-
+	logrus.Infof("[Server.handle] 2: flag: %s, time: %s", apiOp.Request.Header.Get("flag"), time.Now().String())
 	s.setDefaults(apiOp)
-
+	logrus.Infof("[Server.handle] 3: flag: %s, time: %s", apiOp.Request.Header.Get("flag"), time.Now().String())
 	var cloned *types.APISchemas
 	for id, schema := range apiOp.Schemas.Schemas {
 		if schema.RequestModifier == nil {
@@ -129,7 +131,7 @@ func (s *Server) handle(apiOp *types.APIRequest, parser parse.Parser) {
 		schema = schema.RequestModifier(apiOp, schema)
 		cloned.Schemas[id] = schema
 	}
-
+	logrus.Infof("[Server.handle] 4: flag: %s, time: %s", apiOp.Request.Header.Get("flag"), time.Now().String())
 	if cloned != nil {
 		apiOp.Schemas = cloned
 	}
@@ -162,7 +164,7 @@ func (s *Server) handleOp(apiOp *types.APIRequest) (int, interface{}, error) {
 	if apiOp.Schema == nil {
 		return http.StatusNotFound, nil, nil
 	}
-
+	logrus.Infof("[Server.handleOp] 1: flag: %s, time: %s", apiOp.Request.Header.Get("flag"), time.Now().String())
 	action, err := ValidateAction(apiOp)
 	if err != nil {
 		return 0, nil, err
@@ -177,7 +179,7 @@ func (s *Server) handleOp(apiOp *types.APIRequest) (int, interface{}, error) {
 		}
 		return http.StatusOK, nil, handleAction(apiOp)
 	}
-
+	logrus.Infof("[Server.handleOp] 2: flag: %s, time: %s", apiOp.Request.Header.Get("flag"), time.Now().String())
 	switch apiOp.Method {
 	case http.MethodGet:
 		if apiOp.Name == "" {
@@ -198,7 +200,7 @@ func (s *Server) handleOp(apiOp *types.APIRequest) (int, interface{}, error) {
 		data, err := handle(apiOp, apiOp.Schema.DeleteHandler, handlers.MetricsHandler("200", handlers.DeleteHandler))
 		return http.StatusOK, data, err
 	}
-
+	logrus.Infof("[Server.handleOp] 3: flag: %s, time: %s", apiOp.Request.Header.Get("flag"), time.Now().String())
 	return http.StatusNotFound, nil, nil
 }
 
