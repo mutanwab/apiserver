@@ -164,7 +164,7 @@ func (s *Server) handleOp(apiOp *types.APIRequest) (int, interface{}, error) {
 	if apiOp.Schema == nil {
 		return http.StatusNotFound, nil, nil
 	}
-	logrus.Infof("[Server.handleOp] 1: flag: %s, time: %s", apiOp.Request.Header.Get("flag"), time.Now().String())
+	logrus.Infof("[Server.handleOp] 1: type: %s, flag: %s, time: %s", apiOp.Request.URL, apiOp.Request.Header.Get("flag"), time.Now().String())
 	action, err := ValidateAction(apiOp)
 	if err != nil {
 		return 0, nil, err
@@ -179,7 +179,7 @@ func (s *Server) handleOp(apiOp *types.APIRequest) (int, interface{}, error) {
 		}
 		return http.StatusOK, nil, handleAction(apiOp)
 	}
-	logrus.Infof("[Server.handleOp] 2: flag: %s, time: %s", apiOp.Request.Header.Get("flag"), time.Now().String())
+	logrus.Infof("[Server.handleOp] 2: type: %s, flag: %s, time: %s", apiOp.Request.URL, apiOp.Request.Header.Get("flag"), time.Now().String())
 	switch apiOp.Method {
 	case http.MethodGet:
 		if apiOp.Name == "" {
@@ -200,7 +200,6 @@ func (s *Server) handleOp(apiOp *types.APIRequest) (int, interface{}, error) {
 		data, err := handle(apiOp, apiOp.Schema.DeleteHandler, handlers.MetricsHandler("200", handlers.DeleteHandler))
 		return http.StatusOK, data, err
 	}
-	logrus.Infof("[Server.handleOp] 3: flag: %s, time: %s", apiOp.Request.Header.Get("flag"), time.Now().String())
 	return http.StatusNotFound, nil, nil
 }
 
