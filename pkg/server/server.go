@@ -147,13 +147,21 @@ func (s *Server) handle(apiOp *types.APIRequest, parser parse.Parser) {
 	if code, data, err = s.handleOp(apiOp); err != nil {
 		apiOp.WriteError(err)
 	} else if obj, ok := data.(types.APIObject); ok {
+		logrus.Infof("[Server.handle] 5: flag: %s, time: %s", apiOp.Request.Header.Get("flag"), time.Now().String())
 		apiOp.WriteResponse(code, obj)
+		logrus.Infof("[Server.handle] 5-1: flag: %s, time: %s", apiOp.Request.Header.Get("flag"), time.Now().String())
 	} else if list, ok := data.(types.APIObjectList); ok {
+		logrus.Infof("[Server.handle] 6: flag: %s, time: %s", apiOp.Request.Header.Get("flag"), time.Now().String())
 		apiOp.WriteResponseList(code, list)
+		logrus.Infof("[Server.handle] 6-1: flag: %s, time: %s", apiOp.Request.Header.Get("flag"), time.Now().String())
 	} else if code > http.StatusOK {
+		logrus.Infof("[Server.handle] 7: flag: %s, time: %s", apiOp.Request.Header.Get("flag"), time.Now().String())
 		apiOp.Response.WriteHeader(code)
+		logrus.Infof("[Server.handle] 7-1: flag: %s, time: %s", apiOp.Request.Header.Get("flag"), time.Now().String())
 	}
+	logrus.Infof("[Server.handle] 8: flag: %s, time: %s", apiOp.Request.Header.Get("flag"), time.Now().String())
 	metrics.RecordResponseTime(apiOp.Schema.ID, apiOp.Method, strconv.Itoa(code), float64(time.Since(requestStart).Milliseconds()))
+	logrus.Infof("[Server.handle] 8-1: flag: %s, time: %s", apiOp.Request.Header.Get("flag"), time.Now().String())
 }
 
 func (s *Server) handleOp(apiOp *types.APIRequest) (int, interface{}, error) {
@@ -184,6 +192,7 @@ func (s *Server) handleOp(apiOp *types.APIRequest) (int, interface{}, error) {
 	case http.MethodGet:
 		if apiOp.Name == "" {
 			data, err := handleList(apiOp, apiOp.Schema.ListHandler, handlers.MetricsListHandler("200", handlers.ListHandler))
+			logrus.Infof("[Server.handleOp] 3: type: %s, flag: %s, time: %s", apiOp.Request.URL, apiOp.Request.Header.Get("flag"), time.Now().String())
 			return http.StatusOK, data, err
 		}
 		data, err := handle(apiOp, apiOp.Schema.ByIDHandler, handlers.MetricsHandler("200", handlers.ByIDHandler))

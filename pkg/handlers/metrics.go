@@ -1,7 +1,9 @@
 package handlers
 
 import (
+	"github.com/sirupsen/logrus"
 	"strconv"
+	"time"
 
 	"github.com/rancher/apiserver/pkg/apierror"
 	"github.com/rancher/apiserver/pkg/metrics"
@@ -26,6 +28,7 @@ func MetricsHandler(successCode string, next func(apiRequest *types.APIRequest) 
 
 func MetricsListHandler(successCode string, next func(apiRequest *types.APIRequest) (types.APIObjectList, error)) func(apiRequest *types.APIRequest) (types.APIObjectList, error) {
 	return func(request *types.APIRequest) (types.APIObjectList, error) {
+		logrus.Info("MetricsListHandler 1: type: %s, flag: %s, time: %s", request.Request.URL, request.Request.Header.Get("flag"), time.Now().String())
 		objList, err := next(request)
 		if err != nil {
 			if apiError, ok := err.(*apierror.APIError); ok {
@@ -33,8 +36,9 @@ func MetricsListHandler(successCode string, next func(apiRequest *types.APIReque
 			}
 			return types.APIObjectList{}, err
 		}
-
+		logrus.Info("MetricsListHandler 2: type: %s, flag: %s, time: %s", request.Request.URL, request.Request.Header.Get("flag"), time.Now().String())
 		metrics.IncTotalResponses(request.Schema.ID, request.Method, successCode)
+		logrus.Info("MetricsListHandler 3: type: %s, flag: %s, time: %s", request.Request.URL, request.Request.Header.Get("flag"), time.Now().String())
 		return objList, err
 	}
 }
